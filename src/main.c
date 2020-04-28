@@ -40,11 +40,64 @@ static char *check_distro(){
 
 int main(int c, char *v[]){
   printf("==> it's not stable yet!\n");
+  printf("==> your distro is: %s\n", check_distro());
   if (c == 0)
     return 1;
   for (int i=1; i<c; i++){
-    if (strcmp(v[i], "-S") == 0){
-      printf("==> %s\n", check_distro());
+    if (check_distro() != "other"){
+      if (strcmp(v[i], "-S") == 0){ // install command
+	if (strcmp(check_distro(), "fedora") == 0 ||
+	    strcmp(check_distro(), "redhat") == 0){
+	  char cmd[25] = "sudo dnf in ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "debian") == 0){
+	  char cmd[25] = "sudo apt install ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "suse") == 0){
+	  char cmd[25] = "sudo zypper in ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+      }
+      if (strcmp(v[i], "-Syu") == 0){ // update command
+	if (strcmp(check_distro(), "fedora") == 0 ||
+	    strcmp(check_distro(), "redhat") == 0){
+	  char cmd[25] = "sudo dnf update";
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "debian") == 0){
+	  char cmd[25] = "sudo apt update";
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "suse") == 0){
+	  char cmd[25] = "sudo zypper up";
+	  system(cmd);
+	}
+      }
+      if (strcmp(v[i], "-Runs") == 0){ // remove command
+	if (strcmp(check_distro(), "fedora") == 0 ||
+	    strcmp(check_distro(), "redhat") == 0){
+	  char cmd[25] = "sudo dnf erase ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "debian") == 0){
+	  char cmd[25] = "sudo apt purge ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+	if (strcmp(check_distro(), "suse") == 0){
+	  char cmd[25] = "sudo zypper remove ";
+	  strcat(cmd, v[i+1]);
+	  system(cmd);
+	}
+      }
+    } else {
+      printf("couldn't detect distro\n");
     }
   }
   return 0;
@@ -53,6 +106,7 @@ int main(int c, char *v[]){
 
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64) || defined(WIN64)
 #include <conio.h>
+
 int main(void){
   printf("windows is unsupported\n");
   getch();
